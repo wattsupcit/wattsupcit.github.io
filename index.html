@@ -487,7 +487,7 @@ const apl=(k,ev,n,o)=>{const A=CA[k],S=SN[k];
  if(!n)return;const i=rid(k,n),j=cj(k,n),x=A.findIndex(r=>rid(k,r)===i);
  if(x<0){A.push(n);S.set(i,j)}else{if(S.get(i)===j&&cj(k,A[x])===j)return;Object.assign(A[x],n);S.set(i,j)}
  if(k==='fr')rfp();cng(k)};
-const rcn=on=>{try{let e=document.getElementById('rcn');if(!e){e=document.createElement('div');e.id='rcn';e.setAttribute('role','status');e.style.cssText='position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:99999;padding:6px 12px;border-radius:14px;background:#1c2a46;color:#fff;font:600 12px sans-serif;display:none';e.textContent='Reconnecting…';document.body.appendChild(e)}e.style.display=on?'block':'none'}catch(x){}};
+const rcn=on=>{try{let e=document.getElementById('rcn');if(!e){e=document.createElement('div');e.id='rcn';e.setAttribute('role','status');e.style.cssText='position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:99999;padding:6px 12px;border-radius:14px;background:#1c2a46;color:#fff;font:600 12px sans-serif;display:none';e.textContent='Reconnecting…';document.body.appendChild(e)}e.style.display='none'}catch(x){}};
 const stt=s=>{if(s==='SUBSCRIBED'){clearTimeout(rcT);rcT=0;rcn(0)}else if(booted&&!rcT&&/ERROR|TIMED_OUT|CLOSED/.test(s))rcT=setTimeout(()=>rcn(1),5e3)};
 const unsub=async()=>{const a=[rch,tch].filter(Boolean);rch=tch=null;try{(sb.getChannels?sb.getChannels():[]).forEach(c=>{if(/^realtime:(db|typing)$/.test(c.topic)&&!a.includes(c))a.push(c)})}catch(e){}for(const c of a)try{await sb.removeChannel(c)}catch(e){}};
 const subs=async()=>{await unsub();try{rch=sb.channel('db');KS.forEach(k=>rch.on('postgres_changes',{event:'*',schema:'public',table:T[k][0]},p=>apl(k,p.eventType,p.new,p.old)));rch.subscribe(stt);
