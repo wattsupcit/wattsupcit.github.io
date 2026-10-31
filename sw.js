@@ -1,5 +1,5 @@
 // Bump VERSION on EVERY update you deploy (v1 -> v2 -> v3 ...) so phones drop the old cache.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const PREFIX = 'wattsupcit-';
 const CACHE = PREFIX + VERSION;
 const PRECACHE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
