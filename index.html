@@ -425,7 +425,10 @@ const flush=()=>{if(!fsc)return;fsc=0;const ks=[...pend];pend.clear();ks.forEach
 const cng=k=>{pend.add(k);if(fsc)return;fsc=1;try{requestAnimationFrame(flush)}catch(e){}setTimeout(flush,300)};
 const R=k=>T[k]?CA[k]:DB.get('sb_'+k,[]);
 const pk0=(r,cs)=>{const o={};cs.forEach(c=>{if(r[c]!=null)o[c]=r[c]});return o};
+/* one account per browser, like Facebook: every tab shares ONE Supabase login, so if another tab signed in as someone else, follow it instead of writing as the wrong person */
+let swn=0;const swt=u=>{if(swn)return;swn=1;try{toast('You signed in as @'+u+' in another tab. Switching…')}catch(e){}setTimeout(()=>location.reload(),1300)};
 const psh=async(k,ins,upd,del)=>{const t=sb.from(T[k][0]),P=T[k][1],ok=r=>{if(r.error)throw r.error};
+ try{const g=(await sb.auth.getSession()).data.session,u=g&&unOf(g.user);if(u&&me&&u!==me.username)return swt(u)}catch(e){}
  if(ins.length&&k!=='users')ok(await t.insert(ins.map(r=>pk0(r,CL[k]))));
  await Promise.all(upd.map(([r,o])=>{const c={};T[k][2].forEach(f=>{const n=r[f]==null?null:r[f];if(JSON.stringify(n)!==JSON.stringify(o[CL[k].indexOf(f)]))c[f]=n});if(!Object.keys(c).length)return;let u=t.update(c);P.forEach(f=>{u=u.eq(f,r[f])});return u.then(ok)}));
  if(del.length&&k!=='users'){if(P.length===1)ok(await t.delete().in(P[0],del));else await Promise.all(del.map(i=>{const v=i.split('|');let d=t.delete();P.forEach((f,x)=>{d=d.eq(f,v[x])});return d.then(ok)}))}};
@@ -494,7 +497,7 @@ const boo=un=>booted===un?Promise.resolve():bp||(bp=(async()=>{try{stp();await h
 /* reconnect: when the tab is visible again or the network returns, re-hydrate and resubscribe */
 const rsy=()=>{clearTimeout(rsT);rsT=setTimeout(async()=>{if(document.hidden)return;if(booted){try{await hy(KS,1);await subs()}catch(e){}}else if(rtry){rtry=0;strt()}},400)};
 document.addEventListener('visibilitychange',rsy);addEventListener('online',rsy);
-if(sb)sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&booted){stp();SES.set(null);me=null;shut();show()}});
+if(sb)sb.auth.onAuthStateChange((ev,g)=>{if(ev==='SIGNED_OUT'&&booted){stp();SES.set(null);me=null;shut();show()}else if(g&&g.user&&booted&&me){const u=unOf(g.user);if(u&&u!==me.username)swt(u)}});
 /* signup checks via RPC (anonymous visitors can read nothing); dup[type][value] = taken? */
 const dup={u:{},c:{}},dT={};
 const dupRun=async(id,v)=>{const t=id==='ru'?'u':'c';try{const r=await sb.rpc('check_signup',t==='u'?{u:v,c:''}:{u:'',c:v});if(r.error)throw r.error;dup[t][v]=r.data===t}catch(e){return}
