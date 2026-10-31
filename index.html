@@ -321,6 +321,51 @@ html.ldw .es::after{content:"";position:absolute;inset:0;background:linear-gradi
 @media (prefers-reduced-motion:reduce){.ldr .ldo,.ldr .ldb,html.ldw .es::after{animation:none}#ld,#ld>.ldt{transition:none}}
 </style></head>
 <body>
+<script>/* [WU-GATE] browser tab -> install guide; installed app -> normal app. A screen, not security. ?skipinstall=1 sets wu_skip_install, ?skipinstall=0 clears it */
+(()=>{const w=window,d=document,L=location,N="Watt's Up",st=f=>{try{return f(w.localStorage)}catch(e){}},mm=m=>{try{return w.matchMedia('(display-mode:'+m+')').matches}catch(e){return false}};
+let q='';try{q=new URLSearchParams(L.search).get('skipinstall')}catch(e){}
+if(q==='1')st(s=>s.setItem('wu_skip_install','1'));else if(q==='0')st(s=>s.removeItem('wu_skip_install'));
+if(mm('standalone')||mm('fullscreen')||mm('minimal-ui')||navigator.standalone===true||/^(file|content):$/.test(L.protocol)||/^(localhost|127\.0\.0\.1|\[::1\])$/.test(L.hostname)||q==='1'||(q!=='0'&&st(s=>s.getItem('wu_skip_install'))==='1'))return;
+w.__wuGate=1;d.documentElement.className+=' wu-gate';
+const ua=navigator.userAgent||'',ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),an=/Android/i.test(ua),
+iab=/FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|TikTok|musical_ly|BytedanceWebview|Line\/|Snapchat|Twitter|LinkedInApp|MicroMessenger|; wv\)/.test(ua)||(ios&&!/Safari\//.test(ua)),
+oth=an&&!iab&&(!!navigator.brave||/SamsungBrowser|EdgA|OPR\/|Opera|OPT\/|Firefox|DuckDuckGo|UCBrowser|Vivaldi/.test(ua)),br=ios?'Safari':'Chrome',url=L.origin+L.pathname,
+/* steps: [caption, image, alt, extra html]. Add a picture later by giving an iOS step an image path, e.g. ['Tap the Share button.','./ios1.jpg','Safari with the Share button highlighted'] */
+A=[['Tap the ⋮ menu at the top right of Chrome.','./step1.jpg','Chrome with a red box and arrow on the ⋮ menu at the top right'],
+['Tap “Install and create shortcut”.','./step2.jpg','Chrome menu with a red box around “Install and create shortcut”'],
+['Tap “Install”. This is the first of two Install taps.','./step3.jpg','Install and create shortcut sheet with a red box around “Install”'],
+['Tap “Install” again to confirm. This is the second Install tap.','./step4.jpg','Install app dialog with a red box around the “Install” button'],
+['Wait a few seconds while it installs.','./step5.jpg','A red box around the “Installing” message at the bottom of the screen'],
+['When you see “App installed”, close the browser and open “'+N+'” from your home screen or app list. Look for the CIT seal icon.','./step6.jpg','A red box around the “App installed” notification at the top of the screen']],
+I=[['Tap the Share button (the square with an arrow pointing up).'],['Scroll down and tap “Add to Home Screen”.'],['Tap “Add” at the top right.'],['Open the app from your home screen. Look for the CIT seal icon.']],
+P=iab?[[`Open this link in ${br}.<span class="wu-m">Tap the ⋮ or … menu, then “Open in ${br}”. Or copy the link and paste it into ${br}.</span>`,'','',`<div class="wu-cp"><input id="wu-u" readonly value="${url}" aria-label="Link"><button id="wu-cb" class="wu-b wu-sm" type="button">Copy link</button></div>`]]:ios?[['Open this page in Safari.']]:[],
+nt=oth?'Using Brave, Samsung Internet or Edge? The menu may look different. Look for “Install app” or “Add to Home screen”. Chrome is recommended.':!ios&&!an?'On a computer? Look for the install icon in the address bar, or open this link on your phone.':'',
+H=P.concat(ios?I:A).map((e,i)=>`<li class="wu-c"><div class="wu-h"><span class="wu-n">${i+1}</span><p>${e[0]}</p></div>${e[3]||''}${e[1]?`<img src="${e[1]}" alt="${e[2]||''}" width="540" height="1150"${i>P.length?' loading="lazy"':''} decoding="async">`:''}</li>`).join('');
+const s=d.createElement('style');s.textContent=`html.wu-gate body>:not(#wu-gate){display:none!important}
+#wu-gate{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483647;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg,#0a1022);color:var(--tx,#e8eefc);font:16px/1.45 'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(28px + env(safe-area-inset-bottom,0px))}
+#wu-gate *{box-sizing:border-box}#wu-gate [hidden]{display:none!important}
+.wu-w{max-width:560px;margin:0 auto}.wu-lg{display:block;width:64px;height:64px;border-radius:16px}
+.wu-w h1{margin:14px 0 8px;font-size:24px;line-height:1.2;font-weight:800;color:var(--tx,#e8eefc)}
+.wu-s,.wu-f,.wu-nt{margin:0 0 16px;color:var(--mut,#9aa8c7)}.wu-nt{padding-left:12px;border-left:3px solid var(--am,#ffb020)}
+.wu-b{display:block;width:100%;margin:0 0 16px;padding:16px;border:0;border-radius:14px;background:var(--acc2,#1a5fe0);color:#fff;font:800 18px 'Plus Jakarta Sans',system-ui,sans-serif;box-shadow:0 6px 18px rgba(47,123,255,.35);cursor:pointer}.wu-b:active{opacity:.85}
+.wu-ok{margin:0 0 16px;padding:12px 14px;border:1px solid var(--am,#ffb020);border-radius:12px;background:rgba(255,176,32,.12);color:var(--am,#ffb020);font-weight:700}
+.wu-l{list-style:none;margin:20px 0;padding:0;display:grid;gap:14px}.wu-c{padding:14px;border:1px solid var(--ln,#1f2f52);border-radius:16px;background:var(--card,#101a33)}
+.wu-h{display:flex;gap:12px;align-items:flex-start}.wu-n{flex:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:2px solid var(--am,#ffb020);border-radius:50%;color:var(--am,#ffb020);font-weight:800}
+.wu-h p{margin:3px 0 0;font-weight:600}.wu-m{display:block;margin-top:4px;color:var(--mut,#9aa8c7);font-size:14px;font-weight:500}
+.wu-c img{display:block;max-width:100%;height:auto;margin:12px auto 0;border-radius:12px}
+.wu-cp{display:flex;gap:8px;margin-top:12px}.wu-cp input{flex:1;min-width:0;padding:10px;border:1px solid var(--ln,#1f2f52);border-radius:10px;background:var(--bg,#0a1022);color:var(--tx,#e8eefc);font:14px system-ui,sans-serif}
+.wu-sm{width:auto;margin:0;padding:10px 16px;font-size:15px;box-shadow:none}.wu-b:focus-visible,.wu-cp input:focus-visible{outline:3px solid var(--am,#ffb020);outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){.wu-b{transition:opacity .15s}}`;d.head.appendChild(s);
+const g=d.createElement('div');g.id='wu-gate';
+g.innerHTML=`<div class="wu-w"><img class="wu-lg" src="./icon-192.png" alt="" width="64" height="64" onerror="this.hidden=true"><h1>Install Watt’s Up CIT to continue</h1><p class="wu-s">This app works only when it’s installed on your phone. Follow the steps below.</p><button id="wu-ib" class="wu-b" type="button" hidden>Install app</button><p id="wu-ok" class="wu-ok" role="status" hidden>Installed! Open ${N} from your home screen.</p>${nt?`<p class="wu-nt">${nt}</p>`:''}<ol class="wu-l">${H}</ol><p class="wu-f">Already installed? Open ${N} from your home screen instead of this browser tab.</p></div>`;
+d.body.insertBefore(g,d.body.firstChild);
+const ib=d.getElementById('wu-ib'),ok=d.getElementById('wu-ok'),cb=d.getElementById('wu-cb');let dp=null;
+w.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;ib.hidden=false});
+ib.onclick=()=>{if(!dp)return;dp.prompt();dp.userChoice.then(()=>{dp=null;ib.hidden=true},()=>{})};
+w.addEventListener('appinstalled',()=>{dp=null;ib.hidden=true;ok.hidden=false;g.scrollTop=0});
+if(cb)cb.onclick=()=>{const i=d.getElementById('wu-u'),done=()=>{cb.textContent='Copied!';setTimeout(()=>{cb.textContent='Copy link'},2000)},old=()=>{try{i.select();i.setSelectionRange(0,i.value.length);d.execCommand('copy')&&done()}catch(e){}};try{navigator.clipboard.writeText(i.value).then(done,old)}catch(e){old()}};
+})();
+</script>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2.2.6 3.5 2.6 3.5 5.7"/></symbol>
@@ -394,6 +439,7 @@ html.ldw .es::after{content:"";position:absolute;inset:0;background:linear-gradi
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.93.0/dist/umd/supabase.js"></script>
 <script>
+if(!window.__wuGate){/* [WU-GATE] app boots only when the install gate is off */
 const SUPA={url:'https://plrvjkpazrwjdzvjygpp.supabase.co',key:'sb_publishable_ekiq0UWsh66zW3wy9cCmTg_9J2s7Epo'}; /* publishable key is public by design; security = RLS */
 (()=>{
 /* ===== DATA MODEL = supabase_schema.sql (rows keyed by USERNAME, ts = epoch ms bigint, RLS on every table) =====
@@ -1129,6 +1175,7 @@ window.__v8={vc:vc0,rl:rlR0};sy();pk();
 })();
 strt();
 })();
+}
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}</script>
 </body>
