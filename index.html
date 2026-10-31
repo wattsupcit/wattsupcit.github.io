@@ -126,7 +126,7 @@ hr{margin:auto 0 16px;border:0;border-top:1px solid #dadde1}
 .card{position:relative;margin-bottom:8px;padding:12px;background:var(--card)}.ph{margin-bottom:8px}.pt{margin:0 0 10px;white-space:pre-wrap;overflow-wrap:anywhere}
 .tp2{display:grid;place-items:center;min-height:220px;margin:0 -12px 8px;padding:24px;color:#fff;font-size:26px;font-weight:700;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere}
 .m{display:block;max-width:100%;margin:0 auto 8px;border-radius:8px}img.m{max-height:520px;object-fit:contain}.vid{width:100%;aspect-ratio:16/9;border:0;background:#000}
-.lnk,.fb a{color:var(--acc);text-decoration:none}.lnk{display:inline-block;margin-bottom:8px;font-size:13px}.fb{margin-bottom:8px;padding:14px;border-radius:8px;background:var(--ln);color:var(--mut);font-size:14px}
+.lnk,.fb a{color:var(--acc);text-decoration:none}.fb.pl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;width:100%;min-height:112px;height:100%;margin:0;padding:12px;text-align:center;font-size:13px;line-height:1.3}.fb.pl svg{width:28px;height:28px;opacity:.55}.bw .fb.pl{min-width:170px;min-height:96px;border-radius:14px}.lnk{display:inline-block;margin-bottom:8px;font-size:13px}.fb{margin-bottom:8px;padding:14px;border-radius:8px;background:var(--ln);color:var(--mut);font-size:14px}
 .gr{display:grid;gap:2px;margin:0 -12px 8px;aspect-ratio:1;overflow:hidden}.g1{aspect-ratio:auto}.g2{aspect-ratio:5/3;grid-template-columns:1fr 1fr}.g3,.g4{grid-template:1fr 1fr/1fr 1fr}.g3 .gi:first-child{grid-row:span 2}
 .g5{grid-template:1fr 1fr/repeat(6,1fr)}.g5 .gi:nth-child(-n+2){grid-column:span 3}.g5 .gi:nth-child(n+3){grid-column:span 2}
 .gi{position:relative;display:block;min-height:0;background:#000;overflow:hidden}.gi .m{width:100%;height:100%;margin:0;border-radius:0;max-height:none;object-fit:cover}.g1 .gi .m{height:auto;max-height:560px;object-fit:contain}
@@ -446,7 +446,7 @@ const SUPA={url:'https://plrvjkpazrwjdzvjygpp.supabase.co',key:'sb_publishable_e
 R('key')/W('key',rows) -> table: users=profiles(id uuid,username,name,first,middle,last,suffix,contact,avatar,avm,cover,covm,bio<=150,edu,dob,g,ts) | fr=friendships(id,from,to,status pending|accepted,ts)
 posts(id,user,text,ms jsonb,bg,img,vid,of,kind,aud pub|fr|me,ts) | comments(id,post,user,text,ts) | rx=reactions(post,user,t) | stories(id,user,text,m,mk,img,bg,ts) | seen=story_views(s,u)
 msgs=messages(id,a,b,txt,m,mk,ts,r,st 1 sending..4 seen) | notifs=notifications(id,to,from,k,text,ts,r,link) | notes(u,text<=60,ts) | presence(u,t)
-Auth = Supabase Auth with email username@users.citspark.app (the app stores no password). RPC: check_signup(u,c), resolve_login(t), delete_my_account(). Storage bucket "media" ({uid}/{id}).
+Auth = Supabase Auth with email username@users.citspark.app (the app stores no password). RPC: check_signup(u,c), resolve_login(t), delete_my_account(). Storage bucket "media" (private; path {username}/{rand}; media id "{username}-{rand}"; see MEDIA section).
 Typing = Realtime broadcast (never stored). Presence = upsert every 30 s. Old local sb_* data is cleared once (sb_ui is kept). */
 const DEV=true,EM=['😀','😂','😍','🥰','😮','😢','😡','👍','🙏','🔥','🎉','❤️'];
 const GR=['linear-gradient(135deg,#1877f2,#7b2ff7)','linear-gradient(135deg,#f5576c,#f093fb)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#f7971e,#ffd200)','linear-gradient(135deg,#232526,#5a5d60)','linear-gradient(135deg,#00c6ff,#0072ff)'];
@@ -539,7 +539,7 @@ const unsub=async()=>{const a=[rch,tch].filter(Boolean);rch=tch=null;try{(sb.get
 const subs=async()=>{await unsub();try{rch=sb.channel('db');KS.forEach(k=>rch.on('postgres_changes',{event:'*',schema:'public',table:T[k][0]},p=>apl(k,p.eventType,p.new,p.old)));rch.subscribe(stt);
  tch=sb.channel('typing');tch.on('broadcast',{event:'t'},m=>RT.fire('typing',m.payload)).subscribe()}catch(e){}};
 const stp=()=>{booted='';unsub();clearTimeout(rfT);clearTimeout(rcT);rcT=0;rcn(0);pend.clear();wq=Promise.resolve();KS.forEach(k=>{CA[k]=[];SN[k]=new Map()})};
-const boo=un=>booted===un?Promise.resolve():bp||(bp=(async()=>{try{stp();await hy();LD.p(98);SES.set(un);booted=un;await subs()}finally{bp=null}})());
+const boo=un=>booted===un?Promise.resolve():bp||(bp=(async()=>{try{stp();await hy();LD.p(98);SES.set(un);booted=un;swSoon();await subs()}finally{bp=null}})());
 /* reconnect: when the tab is visible again or the network returns, re-hydrate and resubscribe */
 const rsy=()=>{clearTimeout(rsT);rsT=setTimeout(async()=>{if(document.hidden)return;if(booted){try{await hy(KS,1);await subs()}catch(e){}}else if(rtry){rtry=0;strt()}},400)};
 document.addEventListener('visibilitychange',rsy);addEventListener('online',rsy);
@@ -556,11 +556,25 @@ const strt=async()=>{let s=null;try{if(sb)s=(await sb.auth.getSession()).data.se
  if(!s){show();try{const l=DB.get('sb_last',null);if(l&&!$('#lu').value)$('#lu').value=l}catch(e){}return}
  const u=unOf(s.user);await LD.go(u,0,()=>boo(u))};
 const idb=new Promise(r=>{try{const q=indexedDB.open('sb_media',1);q.onupgradeneeded=()=>q.result.createObjectStore('m');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
-const mm={},urls={};
-const putMedia=async(id,b)=>{mm[id]=b;const d=await idb;if(d)d.transaction('m','readwrite').objectStore('m').put(b,id)};
-const getMedia=async id=>{if(mm[id])return mm[id];const d=await idb;return d?new Promise(r=>{const q=d.transaction('m').objectStore('m').get(id);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)}):null};
-const mu=async id=>urls[id]||(urls[id]=await getMedia(id).then(b=>b?URL.createObjectURL(b):''));
-const hyd=(r=document)=>r.querySelectorAll('[data-mid]:not([src])').forEach(async e=>{const u=await mu(e.dataset.mid);if(!e.isConnected)return;u?e.src=u:e.dispatchEvent(new Event('error'))});
+/* ===== MEDIA = private Supabase Storage bucket "media". Path {username}/{rand}; a media id is "{username}-{rand}" (usernames never contain "-"), so anyone can locate a file from the id alone; the thumbnail is id+"t". Memory + IndexedDB are only a cache: memory -> IndexedDB -> signed-URL download. ===== */
+const MBK='media',MTTL=7200,mm={},urls={},mSg={},mQ=new Map(),mFly={},mMiss={};let mT=0;
+const mpath=id=>{const i=String(id).indexOf('-');return i>0?id.slice(0,i)+'/'+id.slice(i+1):''};
+const mkid=async()=>{let u=me&&me.username;if(!u)try{const s=(await sb.auth.getSession()).data.session;u=s&&unOf(s.user)}catch(e){}if(!u)throw Error('Please sign in again.');return u+'-'+uid()};
+const putMedia=async(id,b)=>{mm[id]=b;try{const d=await idb;if(d)d.transaction('m','readwrite').objectStore('m').put(b,id)}catch(e){}};
+const mloc=async id=>{if(mm[id])return mm[id];const d=await idb;return d?new Promise(r=>{try{const q=d.transaction('m').objectStore('m').get(id);q.onsuccess=()=>{if(q.result)mm[id]=q.result;r(q.result||null)};q.onerror=()=>r(null)}catch(e){r(null)}}):null};
+/* signed URLs: batched, cached, re-signed 5 min before expiry. Result: URL | '' (missing / no access) | null (temporary failure) */
+const msign=id=>{const c=mSg[id];if(c&&c.e-Date.now()>3e5)return Promise.resolve(c.u);if(mQ.has(id))return mQ.get(id).p;let f;const p=new Promise(r=>f=r);mQ.set(id,{p,f});clearTimeout(mT);
+ mT=setTimeout(async()=>{const b=[...mQ];mQ.clear();try{const r=await sb.storage.from(MBK).createSignedUrls(b.map(x=>mpath(x[0])),MTTL);if(r.error)throw r.error;const o={};(r.data||[]).forEach(x=>{if(x.signedUrl)o[x.path]=x.signedUrl});b.forEach(([i,q])=>{const u=o[mpath(i)];if(u)mSg[i]={u,e:Date.now()+MTTL*1e3};q.f(u||'')})}catch(e){b.forEach(x=>x[1].f(null))}},25);return p};
+const mdl=async(id,n)=>{const u=await msign(id);if(u==='')return null;if(!u)throw Error('sign');const r=await fetch(u);if(r.ok)return r.blob();if(r.status===400&&!n){delete mSg[id];return mdl(id,1)}if(r.status===404)return null;throw Error('http '+r.status)};
+const getMedia=async id=>{const l=await mloc(id);if(l)return l;if(!mpath(id)||Date.now()<(mMiss[id]||0))return null;
+ return mFly[id]||(mFly[id]=(async()=>{try{const b=await mdl(id);if(b){await putMedia(id,b);return b}mMiss[id]=Infinity;return null}catch(e){mMiss[id]=Date.now()+3e4;return null}finally{delete mFly[id]}})())};
+const mu=async(id,vid)=>{if(urls[id])return urls[id];
+ if(vid&&mpath(id)&&Date.now()>=(mMiss[id]||0)&&!await mloc(id)){const u=await msign(id);if(u)return u;mMiss[id]=u===''?Infinity:Date.now()+3e4;return ''} /* videos stream from the signed URL (range requests) unless already cached locally */
+ const b=await getMedia(id);return b?(urls[id]=URL.createObjectURL(b)):''};
+const hyd=(r=document)=>r.querySelectorAll('[data-mid]:not([src]):not([data-gone])').forEach(async e=>{if(e._h)return;e._h=1;let u='';try{u=await mu(e.dataset.mid,e.tagName==='VIDEO')}catch(x){}e._h=0;if(!e.isConnected)return;if(u)e.src=u;else{e.dataset.gone=1;e.dispatchEvent(new Event('error'))}});
+addEventListener('online',()=>{for(const k in mMiss)if(mMiss[k]!==Infinity)delete mMiss[k]});
+const mup=async(id,b)=>{const p=mpath(id);for(let n=0;;n++){try{const r=await sb.storage.from(MBK).upload(p,b,{contentType:b.type||'application/octet-stream',cacheControl:'31536000',upsert:false});if(!r.error||/exist|duplicate/i.test(String(r.error.message||r.error)))return;throw r.error}catch(e){if(n)throw e;await new Promise(r=>setTimeout(r,800))}}};
+const mupAll=async L=>{try{await Promise.all(L.map(x=>mup(x[0],x[1])))}catch(e){try{sb.storage.from(MBK).remove(L.map(x=>mpath(x[0]))).catch(()=>{})}catch(x){}throw Error(navigator.onLine?'Upload failed. Please try again.':'You’re offline. Check your connection and try again.')}for(const x of L)await putMedia(x[0],x[1])};
 /* ===== HELPERS ===== */
 const $=(s,r=document)=>r.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -615,8 +629,8 @@ const fact=(p,a)=>{const m=me.username,F=R('fr'),x=F.find(y=>(y.from===m&&y.to==
  else if(a==='ok'&&x&&x.status==='pending'&&x.to===m){x.status='accepted';x.ts=Date.now();W('fr',F);cl();notify(p,'accept','accepted your friend request.','profile:'+m)}
  else if(x&&(a==='no'||a==='cancel'||a==='unf')){W('fr',F.filter(y=>y!==x));cl()}
  render()};
-const avp=async f=>{if(!f.type.startsWith('image/'))throw Error('Choose a photo for your profile picture.');if(f.size>3e7)throw Error('That photo is too large (max 30 MB).');const b=await createImageBitmap(f,{imageOrientation:'from-image'}),s=Math.min(b.width,b.height),c=document.createElement('canvas');c.width=c.height=512;c.getContext('2d').drawImage(b,(b.width-s)/2,(b.height-s)/2,s,s,0,0,512,512);b.close&&b.close();const id=uid();await putMedia(id,await new Promise(r=>c.toBlob(r,'image/jpeg',.85)));return id};
-const setAv=(un,id)=>{const U=R('users'),u=U.find(x=>x.username===un);if(!u)return;u.avm=id;W('users',U);if(me&&me.username===un)me=find(un)};
+const avp=async f=>{if(!f.type.startsWith('image/'))throw Error('Choose a photo for your profile picture.');if(f.size>3e7)throw Error('That photo is too large (max 30 MB).');const b=await createImageBitmap(f,{imageOrientation:'from-image'}),s=Math.min(b.width,b.height),c=document.createElement('canvas');c.width=c.height=512;c.getContext('2d').drawImage(b,(b.width-s)/2,(b.height-s)/2,s,s,0,0,512,512);b.close&&b.close();const id=await mkid();await mupAll([[id,await new Promise(r=>c.toBlob(r,'image/jpeg',.85))]]);return id};
+const setAv=(un,id)=>{const U=R('users'),u=U.find(x=>x.username===un);if(!u)return;const o=u.avm;u.avm=id;W('users',U);if(me&&me.username===un)me=find(un);o&&o!==id&&qdel([o])};
 /* ===== SHEET (one reusable sheet/modal) + TOAST (one reusable toast) ===== */
 const sheet=(h,c='')=>{const s=$('#sh');s.className=c;$('.sc2',s).innerHTML=h;requestAnimationFrame(()=>s.classList.add('on'))};
 const closeSheet=()=>$('#sh').classList.remove('on');
@@ -629,8 +643,8 @@ const toast=(h,o={})=>{const t=$('#ts');t.innerHTML=`<div>${h}</div>${o.act?`<bu
 const proc=async f=>{
  if(f.type.startsWith('image/')){if(f.size>3e7)throw Error('That photo is too large (max 30 MB).');
   const b=await createImageBitmap(f,{imageOrientation:'from-image'}),cv=(w,q)=>new Promise(r=>{const s=Math.min(1,w/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.round(b.width*s);c.height=Math.round(b.height*s);c.getContext('2d').drawImage(b,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',q)});
-  const id=uid(),[big,th]=await Promise.all([cv(1600,.82),cv(320,.7)]);b.close&&b.close();await putMedia(id,big);await putMedia(id+'t',th);return {id,k:'i'}}
- if(f.type.startsWith('video/')){if(f.size>2e7)throw Error('That video is too large (max 20 MB).');const id=uid();await putMedia(id,f);return {id,k:'v'}}
+  const id=await mkid(),[big,th]=await Promise.all([cv(1600,.82),cv(320,.7)]);b.close&&b.close();await mupAll([[id,big],[id+'t',th]]);return {id,k:'i'}}
+ if(f.type.startsWith('video/')){if(f.size>2e7)throw Error('That video is too large (max 20 MB).');const id=await mkid();await mupAll([[id,f]]);return {id,k:'v'}}
  throw Error('Only photos and short videos can be uploaded.')};
 const pg=p=>{const e=$('#pgb');if(e){e.style.transform=`scaleX(${p})`;e.parentNode.hidden=!p}};
 const pick=(cam,fn,pr=proc,one)=>{const i=document.createElement('input');i.type='file';i.accept='image/*,video/*';i.multiple=!cam&&!one;if(cam)i.capture='environment';
@@ -802,7 +816,7 @@ document.addEventListener('click',e=>{const t=e.target,c=q=>t.closest(q);let x;i
   if(['add','cancel','ok','no','unf'].includes(a)){closeSheet();fact(p,a);return pgR()}
   if(a==='avt'){if(pgLive(p).length)return story(p);return sheet(spX(esc(who(p).name))+av(who(p),'enl')),hyd($('#sh'))}
   if(a==='av')return pick(0,o=>{setAv(me.username,o[0]);spSf('av',o[0]);toast('Profile picture updated');render();pgR()},avp,1);
-  if(a==='cvr')return pick(0,o=>{const U=R('users'),u=U.find(z=>z.username===me.username);u.covm=o[0];u.cover='';W('users',U);me=find(me.username);spSf('cv',o[0]);toast('Cover photo updated');pgR()},avp,1);
+  if(a==='cvr')return pick(0,o=>{const U=R('users'),u=U.find(z=>z.username===me.username);qdel([u.covm]);u.covm=o[0];u.cover='';W('users',U);me=find(me.username);spSf('cv',o[0]);toast('Cover photo updated');pgR()},avp,1);
   if(a==='note')return sheet(spX('Your note')+`<input id="nt" maxlength="60" placeholder="Share a note…" value="${esc(myNote(me.username))}"><div class="fb2"><button class="btn" data-nt="1">Share</button><button class="btn g" data-nt="0">Delete</button></div>`);
   if(a==='save'){const U=R('users'),u=U.find(z=>z.username===me.username);u.bio=($('#eb').value||'').trim().slice(0,150);u.edu=($('#ee').value||'').trim().slice(0,60);W('users',U);me=find(me.username);closeSheet();toast('Profile saved');return pgR()}
   if(a==='all'){const L=fl(p);return sheet(spX('Friends ('+L.length+')')+`<input id="pfq" placeholder="Search friends"><div id="pfl">${spRows(L,'')}</div>`),hyd($('#sh'))}
@@ -906,7 +920,7 @@ $('#sh').onclick=e=>{const t=e.target,g=s=>t.closest(s);let x;
  if(x=g('[data-p]'))return pick(x.dataset.p==='1',addMs);
  if(g('[data-e]'))return $('#ce2').hidden=!$('#ce2').hidden;
  if(x=g('[data-j]')){const m=$('#mt');m.value+=x.dataset.j;return m.oninput()}
- if(x=g('[data-r]')){C.ms.splice(+x.dataset.r,1);return cmp()}
+ if(x=g('[data-r]')){qdel(C.ms.splice(+x.dataset.r,1).map(m=>m.id));return cmp()}
  if(g('[data-l]')){$('#lk').hidden=false;return $('#lk').focus()}
  if(t.id==='go')return submit();
  if(x=g('.pr')){const p=x.dataset.u,b=g('[data-a]');if(b){if(!b.disabled){fact(p,b.dataset.a);sq()}return}const r=DB.get(rsk(),[]).filter(y=>y!==p);r.unshift(p);DB.set(rsk(),r.slice(0,8));closeSheet();return prof(p)}
@@ -969,10 +983,11 @@ let lvf=0;RT.on('data',k=>{if(k==='msgs')for(const p in typ)delete typ[p];cancel
 RT.on('typing',d=>{if(!me||d.to!==me.username)return;typ[d.from]=Date.now();chatP===d.from&&chl();setTimeout(()=>chatP===d.from&&chl(),4100)});
 RT.on('presence',()=>{ph();cur==='msgs'&&!chatP&&msgs()});
 /* ===== MEDIA FALLBACKS ===== */
+const PLI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>',PL=(w,x='')=>`<div class="fb pl" role="img" aria-label="${w} unavailable">${PLI}<span>${w} unavailable</span>${x}</div>`;
 document.addEventListener('error',e=>{const t=e.target,n=t.tagName,c=t.classList;
- if(n==='IMG'){if(c.contains('av')){if(!t.dataset.f){t.dataset.f=1;t.src=ini(t.alt)}}else if(c.contains('th'))t.remove();
-  else if(c.contains('m'))t.outerHTML=`<div class="fb">⚠ Image couldn’t be loaded.${/^https?:/.test(t.src)?` <a href="${esc(t.src)}" target="_blank" rel="noopener noreferrer">Open link ↗</a>`:''}</div>`}
- else if(n==='VIDEO')t.outerHTML='<div class="fb">⚠ Video couldn’t be played.</div>'},true);
+ if(n==='IMG'){if(c.contains('av')){if(!t.dataset.f){t.dataset.f=1;t.src=ini(t.alt)}}else if(c.contains('th')||c.contains('cvi'))t.remove();
+  else if(c.contains('m'))t.outerHTML=PL('Photo',/^https?:/.test(t.src)&&!t.dataset.mid?` <a href="${esc(t.src)}" target="_blank" rel="noopener noreferrer">Open link ↗</a>`:'')}
+ else if(n==='VIDEO'){const i=t.dataset.mid||t.dataset.rm;if(i&&/^https?:/.test(t.src)&&!t._rs){t._rs=1;delete mSg[i];mu(i,1).then(u=>{if(!t.isConnected)return;if(u)t.src=u;else t.outerHTML=PL('Video')})}else t.outerHTML=PL('Video')}},true);
 let hqf;try{new MutationObserver(()=>{cancelAnimationFrame(hqf);hqf=requestAnimationFrame(()=>hyd())}).observe(document.body,{childList:true,subtree:true})}catch(e){}
 if(!SES.get()){const l=DB.get('sb_last',null)||DB.get('sb_session',null);if(l&&find(l))SES.set(l)}
 setInterval(ping,3e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping()});
@@ -1045,23 +1060,41 @@ const cfOk=()=>{const o=CF,b=$('#cfb');if(o&&b)b.disabled=!((!o.w||$('#cf1').val
 const cfgo=async()=>{const o=CF,b=$('#cfb');if(!o||!b||b.disabled)return;b.disabled=true;const r=await o.fn($('#cf2')?$('#cf2').value:'');if(r){$('#cfe').textContent=r;const c=$('#sh .sc2');c.classList.remove('sk');void c.offsetWidth;c.classList.add('sk');b.disabled=false;return}CF=null;closeSheet()};
 const refs=()=>{const S=new Set();R('users').forEach(u=>{u.avm&&S.add(u.avm);u.covm&&S.add(u.covm)});R('posts').forEach(p=>(p.ms||[]).forEach(m=>S.add(m.id)));R('stories').forEach(s=>s.m&&S.add(s.m));R('msgs').forEach(m=>m.m&&S.add(m.m));(C.ms||[]).forEach(m=>S.add(m.id));return S};
 const mediaInUse=(id,S)=>{S=S||refs();return S.has(id)||S.has(id.slice(0,-1))}; /* id+'t' thumbnails follow their image */
-const sweepMedia=async()=>{const d=await idb,S=refs();let ks=Object.keys(mm);if(d)ks=[...new Set(ks.concat(await new Promise(r=>{try{const q=d.transaction('m').objectStore('m').getAllKeys();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])}catch(e){r([])}})))];let n=0,sz=0;
- for(const k of ks){if(mediaInUse(k,S))continue;const b=await getMedia(k);sz+=b&&b.size||0;if(d)await new Promise(r=>{try{const t=d.transaction('m','readwrite');t.objectStore('m').delete(k);t.oncomplete=t.onerror=t.onabort=()=>r()}catch(e){r()}});delete mm[k];if(urls[k]){try{URL.revokeObjectURL(urls[k])}catch(e){}delete urls[k]}n++}return{n,sz}};
-const swSoon=()=>setTimeout(()=>sweepMedia().catch(()=>{}),5200);
-const purge=()=>{const T=Date.now(),S=R('stories'),old=new Set(S.filter(s=>T-s.ts>=864e5).map(s=>s.id));let n=old.size;if(n){W('stories',S.filter(s=>!old.has(s.id)));W('seen',R('seen').filter(x=>!old.has(x.s)))}const N=R('notes'),k=N.filter(x=>T-x.ts<864e5);if(k.length!==N.length){n+=N.length-k.length;W('notes',k)}return n};
+const lmKeys=async d=>[...new Set(Object.keys(mm).concat(d?await new Promise(r=>{try{const q=d.transaction('m').objectStore('m').getAllKeys();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])}catch(e){r([])}}):[]))];
+let swD=0;const swSoon=()=>{clearTimeout(swD);swD=setTimeout(()=>sweepMedia().catch(()=>{}),5200)};
+/* Remote files are deleted only after the SERVER confirms no post, story, message or profile uses them. Queue = ids of my own deleted media (waits 6 s for Undo); full orphan scan at most every 12 h, 24 h grace for fresh uploads. */
+const qdel=ids=>{try{const m=me&&me.username;if(!m)return;const Q=DB.get('sb_dq',{});ids.forEach(i=>{if(i&&String(i).startsWith(m+'-'))Q[i]=Date.now()});DB.set('sb_dq',Q);swSoon()}catch(e){}};
+const pgAll=async f=>{const o=[];for(let i=0;;i+=1e3){const r=await f().range(i,i+999);if(r.error)throw r.error;o.push(...r.data);if(r.data.length<1e3)return o}};
+const mrm=async()=>{if(!me||!sb||mrm.b)return;const m=me.username,Q=DB.get('sb_dq',{}),now=Date.now();if(!Object.keys(Q).length&&now-DB.get('sb_ms',0)<432e5)return;mrm.b=1;
+ try{await wq;const U=new Set(refs());
+  (await pgAll(()=>sb.from('posts').select('ms').eq('user',m))).forEach(p=>(p.ms||[]).forEach(x=>x&&x.id&&U.add(x.id)));
+  (await pgAll(()=>sb.from('stories').select('m').eq('user',m))).forEach(s=>s.m&&U.add(s.m));
+  (await pgAll(()=>sb.from('messages').select('m').eq('a',m).neq('m',''))).forEach(x=>x.m&&U.add(x.m));
+  const pr=await sb.from('profiles').select('avm,covm').eq('username',m).maybeSingle();if(pr.error)throw pr.error;if(pr.data)[pr.data.avm,pr.data.covm].forEach(x=>x&&U.add(x));
+  const ns=[];for(let i=0;;i+=1e3){const r=await sb.storage.from(MBK).list(m,{limit:1000,offset:i});if(r.error)throw r.error;ns.push(...r.data.map(x=>x.name));if(r.data.length<1e3)break}
+  const del=ns.filter(f=>{if(!/^[a-z0-9]+$/.test(f))return false;const a=m+'-'+f,b=m+'-'+f.slice(0,-1);if(U.has(a)||U.has(b))return false;const q=Q[a]||Q[b];return q?now-q>6e3:now-parseInt(f.slice(0,8),36)>864e5});
+  for(let i=0;i<del.length;i+=100){const r=await sb.storage.from(MBK).remove(del.slice(i,i+100).map(f=>m+'/'+f));if(r.error)throw r.error}
+  const Z=DB.get('sb_dq',{});Object.keys(Z).forEach(k=>{if(now-Z[k]>6e3)delete Z[k]});DB.set('sb_dq',Z);DB.set('sb_ms',now)}catch(e){}finally{mrm.b=0}};
+const rmAll=async m=>{for(let i=0;i<50;i++){const r=await sb.storage.from(MBK).list(m,{limit:1000});if(r.error)throw r.error;const ns=r.data.map(x=>x.name).filter(f=>f&&f[0]!=='.');if(!ns.length)return;const d=await sb.storage.from(MBK).remove(ns.map(f=>m+'/'+f));if(d.error||!(d.data||[]).length)throw d.error||Error('remove')}};
+const lmWipe=async()=>{for(const k in mm)delete mm[k];for(const k in urls){try{URL.revokeObjectURL(urls[k])}catch(e){}delete urls[k]}const d=await idb;if(d)await new Promise(r=>{try{const t=d.transaction('m','readwrite');t.objectStore('m').clear();t.oncomplete=t.onerror=t.onabort=()=>r()}catch(e){r()}})};
+/* local sweep only trims the CACHE (re-downloadable ids); never before data is loaded, never legacy local-only ids */
+const sweepMedia=async()=>{if(!booted)return{n:0,sz:0};const d=await idb,S=refs();let n=0,sz=0;
+ for(const k of await lmKeys(d)){if(!mpath(k)||mediaInUse(k,S))continue;const b=await mloc(k);sz+=b&&b.size||0;if(d)await new Promise(r=>{try{const t=d.transaction('m','readwrite');t.objectStore('m').delete(k);t.oncomplete=t.onerror=t.onabort=()=>r()}catch(e){r()}});delete mm[k];if(urls[k]){try{URL.revokeObjectURL(urls[k])}catch(e){}delete urls[k]}n++}
+ try{await mrm()}catch(e){}return{n,sz}};
+const purge=()=>{const T=Date.now(),S=R('stories'),old=new Set(S.filter(s=>T-s.ts>=864e5).map(s=>s.id));let n=old.size;if(n){qdel(S.filter(s=>old.has(s.id)).map(s=>s.m));W('stories',S.filter(s=>!old.has(s.id)));W('seen',R('seen').filter(x=>!old.has(x.s)))}const N=R('notes'),k=N.filter(x=>T-x.ts<864e5);if(k.length!==N.length){n+=N.length-k.length;W('notes',k)}return n};
 const clearSp=async()=>{purge();const r=await sweepMedia();render();toast('Freed '+(r.sz/1048576).toFixed(1)+' MB')};
 const postOpt=id=>sheet(spX('Post options')+`<button class="rw rd" data-del="${id}"><span class="rwi">${ic('trash')}</span><span class="fx"><b>Delete post</b></span></button>`);
 const delAsk=id=>cfm({t:'Delete post?',x:'Delete this post? Its comments and reactions will be removed too.',b:'Delete post',fn:()=>{delPost(id)}});
 const delPost=id=>{const P=R('posts'),p=P.find(x=>x.id===id);if(!p)return;const sn={p,rx:R('rx').filter(r=>r.post===id),cm:R('comments').filter(c=>c.post===id),nt:R('notifs').filter(n=>n.link==='post:'+id)};
  W('posts',P.filter(x=>x.id!==id));W('rx',R('rx').filter(r=>r.post!==id));W('comments',R('comments').filter(c=>c.post!==id));W('notifs',R('notifs').filter(n=>n.link!=='post:'+id));ex.delete(id);feed();pgS.length&&pgR();
- toast('Post deleted',{act:'Undo',ms:5000,fn:k=>{if(k==='act'){W('posts',R('posts').concat(sn.p));W('rx',R('rx').concat(sn.rx));W('comments',R('comments').concat(sn.cm));W('notifs',R('notifs').concat(sn.nt));feed();pgS.length&&pgR()}}});swSoon()};
+ qdel((p.ms||[]).map(m=>m.id));toast('Post deleted',{act:'Undo',ms:5000,fn:k=>{if(k==='act'){W('posts',R('posts').concat(sn.p));W('rx',R('rx').concat(sn.rx));W('comments',R('comments').concat(sn.cm));W('notifs',R('notifs').concat(sn.nt));feed();pgS.length&&pgR()}}});swSoon()};
 const delStory=id=>{const S=R('stories'),s=S.find(x=>x.id===id);if(!s)return;const sn=R('seen').filter(x=>x.s===id);W('stories',S.filter(x=>x.id!==id));W('seen',R('seen').filter(x=>x.s!==id));render();pgS.length&&pgR();
- toast('MyDay deleted',{act:'Undo',ms:5000,fn:k=>{if(k==='act'){W('stories',R('stories').concat(s));W('seen',R('seen').concat(sn));render();pgS.length&&pgR()}}});swSoon()};
+ qdel([s.m]);toast('MyDay deleted',{act:'Undo',ms:5000,fn:k=>{if(k==='act'){W('stories',R('stories').concat(s));W('seen',R('seen').concat(sn));render();pgS.length&&pgR()}}});swSoon()};
 const delAcctAsk=()=>cfm({t:'Delete your account?',x:'<p>This permanently deletes:</p><ul><li>Your profile, posts, comments and reactions</li><li>Your MyDay and notes</li><li>Your friendships and every chat you’re in</li><li>Your photos and videos on this device</li></ul><p>Your username and Gmail can be used to register again.</p>',w:'DELETE',pw:1,b:'Delete my account',fn:delAcct});
 const delAcct=async pw=>{if(!await pwOk(pw))return 'Incorrect password.';
- const m=me.username;try{const r=await sb.rpc('delete_my_account');if(r.error)throw r.error}catch(x){return ferr(x)}
+ const m=me.username;try{await rmAll(m)}catch(e){}try{const r=await sb.rpc('delete_my_account');if(r.error)throw r.error}catch(x){return ferr(x)}
  ['sb_rs_','sb_prefs_'].forEach(k=>DB.del(k+m));if(DB.get('sb_last',null)===m)DB.del('sb_last');
- SES.set(null);me=null;await sweepMedia();gone('Your account was deleted.')};
+ SES.set(null);me=null;await lmWipe();gone('Your account was deleted.')};
 const shut=()=>{closeSheet();CF=null;ovAll();pgS.length=0;pgHide();ex.clear();chatP='';$('#ch').classList.remove('on');const v=$('#sv');v.hidden=true;v.innerHTML='';v.onclick=v.onfocusin=v.onfocusout=null};
 const gone=m=>{SES.set(null);me=null;shut();stp();try{sb.auth.signOut({scope:'local'}).catch(()=>{})}catch(e){}show();toast(m||'This account was deleted.')};
 const logout=()=>{const u=me.username;if(DB.get('sb_last',null)===u)DB.set('sb_last',null);SES.set(null);shut();stp();try{sb.auth.signOut({scope:'local'}).catch(()=>{})}catch(e){}show()};
@@ -1128,7 +1161,7 @@ function inf(p){const u=p.user,f=u===me.username?null:fs(u),t=p.text||'';
  return `<div class="qus"><span class="qua" data-qp="${esc(u)}">${av(u,'')}<b>${nm(u)}</b></span>${f===null?'':f===''?`<button class="qfb" data-qf="${esc(u)}"><span>Add friend</span></button>`:`<span class="qfs">${f==='f'?'Friends ✓':'Requested'}</span>`}</div>${t?`<div class="qcap" data-qcp>${esc(t)}</div>${t.length>70?'<span class="qmr" data-qcp>…more</span>':''}`:''}`}
 function rit(p){const m=p.ms.find(m=>m.k==='v');
  return `<section class="ri" data-id="${esc(p.id)}"><video class="qv" data-rm="${esc(m.id)}" loop playsinline preload="auto"></video><button class="qtap" data-qt aria-label="Play or pause"></button><span class="qfl"></span><div class="qui"><div class="qrl">${rail(p)}</div><div class="qinf">${inf(p)}</div><i class="qpg"><b></b></i><button class="qin" data-qcm>Add a comment…</button></div></section>`}
-async function ld(r){const v=r.querySelector('video');if(!v||v.getAttribute('src')||v._l)return;v._l=1;try{const u=await mu(v.dataset.rm);if(u&&r.isConnected&&!v.getAttribute('src')){v.defaultPlaybackRate=v.playbackRate=RATE;v.src=u}}catch(e){}v._l=0}
+async function ld(r){const v=r.querySelector('video');if(!v||v.getAttribute('src')||v._l)return;v._l=1;try{const u=await mu(v.dataset.rm,1);if(u&&r.isConnected&&!v.getAttribute('src')){v.defaultPlaybackRate=v.playbackRate=RATE;v.src=u}}catch(e){}v._l=0}
 function act(r){if(cur===r)return;cur=r;const a=rq('.ri'),i=a.indexOf(r);
  a.forEach((q,j)=>{const v=q.querySelector('video');if(Math.abs(j-i)<=1)ld(q);else if(v.getAttribute('src')){v.pause();v._r=0;v.removeAttribute('src');v.load()}if(q!==r)v.pause()});
  const v=r.querySelector('video');v.playbackRate=RATE;ld(r).then(()=>{if(cur===r&&v.getAttribute('src'))pl(v,SND===true)})}
@@ -1177,6 +1210,6 @@ strt();
 })();
 }
 </script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
 </body>
 </html>
