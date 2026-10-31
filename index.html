@@ -441,7 +441,7 @@ const W=(k,v)=>{if(!T[k]){DB.set('sb_'+k,v);return}
  CA[k]=v;if(!booted||!(ins.length+upd.length+del.length))return;
  const bak=new Map();ins.forEach(r=>bak.set(rid(k,r),undefined));upd.forEach(([r])=>bak.set(rid(k,r),S.get(rid(k,r))));del.forEach(i=>bak.set(i,S.get(i)));
  ins.forEach(r=>S.set(rid(k,r),cj(k,r)));upd.forEach(([r])=>S.set(rid(k,r),cj(k,r)));del.forEach(i=>S.delete(i));
- wq=wq.then(()=>psh(k,ins,upd,del)).catch(e=>{rbk(k,bak);if(k!=='presence')toast(e&&e.code==='42501'?(k==='msgs'?'You can only message accepted friends.':'You don’t have permission to do that.'):'Couldn’t save that. '+(navigator.onLine?'Please try again.':'You’re offline.'))})};
+ wq=wq.then(()=>psh(k,ins,upd,del)).catch(e=>{rbk(k,bak);if(k!=='presence')toast(e&&e.code==='42501'?(k==='msgs'?'You can only message accepted friends.':'You don’t have permission to do that.'+(()=>{try{console.warn('save failed',k,e);const t=String(e.message||'').match(/table "?(\w+)/);return t?' ('+t[1]+')':''}catch(x){return ''}})()):'Couldn’t save that. '+(navigator.onLine?'Please try again.':'You’re offline.'))})};
 /* [V10] charge-meter loader: progress comes from hy() (real table loads) and boo() */
 const LD=(()=>{const g=i=>document.getElementById(i),sl=ms=>new Promise(r=>setTimeout(r,ms)),
  GR=[[25,['users']],[45,['fr']],[65,['posts','comments','rx']],[80,['stories','seen','notes']],[90,['msgs','notifs','presence']]],
