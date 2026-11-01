@@ -673,9 +673,13 @@ const post=(p,X)=>{
 const SK='<div class="card"><div class="ph"><i class="av sk"></i><div class="fx"><i class="sl" style="width:40%"></i></div></div><i class="sl"></i><i class="sl" style="width:80%"></i></div>';
 const AU={pub:'Public',fr:'Friends',me:'Only me'};
 const vis=p=>p.user===me.username||p.aud==='pub'||(p.aud!=='me'&&fl(me.username).includes(p.user));
-const feed=()=>{const X={r:R('rx'),c:R('comments')},ps=R('posts').filter(p=>vis(p)).sort((a,b)=>b.ts-a.ts);
- $('#feed').innerHTML=ps.length?stg(ps,p=>post(p,X)):'<div class="card">'+SPE('No sparks yet','Post the first one and light up the feed.','Post a spark','data-sp')+'</div>';hyd($('#feed'))};
-const refresh=id=>{const p=R('posts').find(x=>x.id===id),el=$(`#feed [data-id="${id}"]`);if(p&&el){const old=[...el.querySelectorAll('[data-mid]')].map(o=>[o,!(o.tagName==='VIDEO'&&o.paused)]),t=document.createElement('template');t.innerHTML=post(p,{r:R('rx'),c:R('comments')});const ne=t.content.firstElementChild;ne.querySelectorAll('[data-mid]').forEach(m=>{const k=old.findIndex(a=>a[0].dataset.mid===m.dataset.mid&&a[0].getAttribute('src'));if(k>=0){const a=old.splice(k,1)[0];m.replaceWith(a[0]);a[0]._pl=a[1]}});el.replaceWith(ne);ne.querySelectorAll('video').forEach(v=>{if(v._pl){v._pl=0;v.play().catch(()=>{})}});hyd(ne)}};
+const feed=()=>{const X={r:R('rx'),c:R('comments')},ps=R('posts').filter(p=>vis(p)).sort((a,b)=>b.ts-a.ts),F=$('#feed');
+ if(ps.length&&F.querySelector(':scope > .post')){const old=new Map([...F.children].filter(e=>e.classList.contains('post')&&e.dataset.id).map(e=>[e.dataset.id,e])),t=document.createElement('div');t.innerHTML=ps.map(p=>post(p,X)).join('');const out=[...t.children].map(n=>{const o=old.get(n.dataset.id),k=pSk(n);pSg(n);if(o&&o._sk===k){pPatch(o,n,null,1);return o}n._sk=k;if(o)n.style.animation='none';return n});let c=F.firstChild;out.forEach(n=>{if(n===c)c=c.nextSibling;else F.insertBefore(n,c)});while(c){const x=c.nextSibling;c.remove();c=x}hyd(F);return}
+ F.innerHTML=ps.length?stg(ps,p=>post(p,X)):'<div class="card">'+SPE('No sparks yet','Post the first one and light up the feed.','Post a spark','data-sp')+'</div>';F.querySelectorAll(':scope > .post').forEach(n=>{n._sk=pSk(n);pSg(n)});hyd(F)};
+const pSk=n=>{const c=n.cloneNode(true);c.querySelectorAll(':scope > .sm,:scope > .bar,:scope > .cms').forEach(x=>x.remove());const m=c.querySelector(':scope > .ph .mut');if(m)m.textContent='';return c.innerHTML};
+const pSg=n=>n.querySelectorAll(':scope > .sm,:scope > .bar,:scope > .cms').forEach(x=>x._sg=x.outerHTML);
+const pPatch=(o,n,s,g)=>{(s||['.sm','.bar','.cms']).forEach(q=>{const a=o.querySelector(':scope > '+q),b=n.querySelector(':scope > '+q);if(a&&b){if(a._sg!==b._sg&&!(g&&q==='.cms'&&a.contains(document.activeElement)))a.replaceWith(b)}else if(b){const r=q==='.sm'?o.querySelector(':scope > .bar'):null;r?r.before(b):o.appendChild(b)}else if(a)a.remove()});const m=o.querySelector(':scope > .ph .mut'),k=n.querySelector(':scope > .ph .mut');if(m&&k&&m.textContent!==k.textContent)m.textContent=k.textContent};
+const refresh=(id,s)=>{const p=R('posts').find(x=>x.id===id),el=$(`#feed [data-id="${id}"]`);if(!p||!el)return;const t=document.createElement('div');t.innerHTML=post(p,{r:R('rx'),c:R('comments')});const n=t.firstElementChild;pSg(n);pPatch(el,n,s);hyd(el)};
 const sc=(u,ss,sn)=>{const s=ss.at(-1),w=who(u);return `<button class="sc${ss.every(x=>sn.has(x.id))?' sd':''}" data-s="${esc(u)}">${s.m?mel({id:s.m,k:s.mk},1,'th'):s.img?`<img class="th" src="${esc(s.img)}" alt="">`:`<span class="stx" style="background:${GR[s.bg||0]}">${esc(s.text)}</span>`}<span class="sa">${av(w)}</span><b class="sn2">${esc(w.name)}</b></button>`};
 const home=()=>{const g=new Map(),sn=new Set(R('seen').filter(x=>x.u===me.username).map(x=>x.s));
  R('stories').filter(s=>Date.now()-s.ts<864e5&&(s.user===me.username||fl(me.username).includes(s.user))).sort((a,b)=>a.ts-b.ts).forEach(s=>g.set(s.user,(g.get(s.user)||[]).concat(s)));
@@ -683,7 +687,7 @@ const home=()=>{const g=new Map(),sn=new Set(R('seen').filter(x=>x.u===me.userna
  $('#stories').innerHTML=`<button class="sc cr" data-o="story">${av(me)}<i class="plus">+</i><b>Create story</b></button>`+[...g].sort((a,b)=>b[1].at(-1).ts-a[1].at(-1).ts).map(([u,ss])=>sc(u,ss,sn)).join('');
  hyd($('#stories'));if(first){first=0;$('#feed').innerHTML=SK+SK;setTimeout(()=>cur==='home'&&me&&feed(),650)}else feed()};
 const rxSent=id=>{const K='sb_rxn_'+me.username,k='post:'+id;let a=DB.get(K,[]);if(!Array.isArray(a))a=[];if(a.includes(k))return true;a.push(k);DB.set(K,a.slice(-500));return false};const react=(id,t)=>{W('rx',R('rx').filter(r=>!(r.post===id&&r.user===me.username)).concat(t?[{post:id,user:me.username,t}]:[]));
- const p=R('posts').find(x=>x.id===id);if(t&&p&&!rxSent(id))notify(p.user,'react',`reacted ${RX[t]} to your post.`,'post:'+id);refresh(id);const b=$(`#feed [data-id="${id}"] .act`);b&&b.classList.add('pp')};
+ const p=R('posts').find(x=>x.id===id);if(t&&p&&!rxSent(id))notify(p.user,'react',`reacted ${RX[t]} to your post.`,'post:'+id);refresh(id,['.sm','.bar']);const b=$(`#feed [data-id="${id}"] .act`);b&&b.classList.add('pp')};
 const sendC=el=>{const id=el.dataset.id,t=$('.cin input',el).value.trim();if(!t)return;
  const cs=R('comments');cs.push({id:uid(),post:id,user:me.username,text:t,ts:Date.now()});W('comments',cs);
  const p=R('posts').find(x=>x.id===id);if(p)notify(p.user,'comment',`commented: “${t.slice(0,80)}”`,'post:'+id);refresh(id);$(`#feed [data-id="${id}"] .cin input`).focus()};
@@ -788,6 +792,12 @@ const pgEl=()=>$('#pg')||document.body.appendChild(Object.assign(document.create
 const pgHide=()=>{const e=$('#pg');if(e){e.hidden=true;e.innerHTML=''}document.body.classList.remove('pgo')};
 const pgPop=()=>{pgS.pop();if(pgS.length){pgT='all';pgR()}else pgHide()};
 const pgBack=()=>{if(pgOK){try{history.back();return}catch(e){}}pgPop()};
+/* [BACK] Android Back / return closes the top layer first (sheet, story or media viewer, chat) instead of exiting the app */
+const BKs={st:[],skip:0,t:0,L:[{n:'sh',q:'#sh',on:e=>e.classList.contains('on'),off:()=>closeSheet()},{n:'sv',q:'#sv',on:e=>!e.hidden,off:()=>{const b=$('#sv [data-c]');if(b)b.click();else $('#sv').hidden=true}},{n:'ch',q:'#ch',on:e=>e.classList.contains('on'),off:()=>closeChat()}]};
+BKs.sync=()=>{BKs.t=0;BKs.L.forEach(l=>{const e=$(l.q);if(!e)return;const o=l.on(e);if(o&&!l.entry){l.entry=true;BKs.st.push(l);try{history.pushState({bk:l.n},'')}catch(x){l.entry=false;BKs.st.pop()}}else if(!o&&l.entry){l.entry=false;const i=BKs.st.indexOf(l);if(i>=0)BKs.st.splice(i,1);if(history.state&&history.state.bk===l.n){BKs.skip++;try{history.back()}catch(x){BKs.skip--}}}})};
+BKs.go=()=>{if(!BKs.t)BKs.t=setTimeout(BKs.sync,70)};
+BKs.L.forEach(l=>{const e=$(l.q);e&&new MutationObserver(BKs.go).observe(e,{attributes:true,attributeFilter:['class','hidden']})});
+window.addEventListener('popstate',e=>{if(BKs.skip>0){BKs.skip--;e.stopImmediatePropagation();return}const l=BKs.st.pop();if(l){l.entry=false;e.stopImmediatePropagation();l.off()}});
 window.addEventListener('popstate',()=>{if(ovS.length)ovPop();else if(pgS.length)pgPop()});
 const prof=p=>{if(!me||!find(p))return;closeSheet();pgS.push(p);pgOK=false;try{history.pushState({pg:pgS.length},'');pgOK=true}catch(e){}pgT='all';pgEl().scrollTop=0;pgR()};
 const pgLive=p=>(p===me.username||fl(me.username).includes(p))?R('stories').filter(x=>x.user===p&&Date.now()-x.ts<864e5):[];
