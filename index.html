@@ -462,7 +462,7 @@ const mem={};
 const DB={get(k,d){try{const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}catch(e){}return k in mem?mem[k]:d},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014))try{stFull()}catch(_){}return false}},del(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}};
 let smem=null;const SES={get(){try{const v=sessionStorage.getItem('sb_tab');if(v)return v}catch(e){}return smem},set(v){smem=v;try{v?sessionStorage.setItem('sb_tab',v):sessionStorage.removeItem('sb_tab')}catch(e){}}};
 /* ===== SUPABASE LAYER: R/W stay synchronous over an in-memory cache; Realtime keeps it fresh ===== */
-let sb=null,tch=null,rch=null,booted='',bp=null,rcT=0,rfT=0,rsT=0,fsc=0,rtry=0,wq=Promise.resolve();const pend=new Set();
+let sb=null,tch=null,rch=null,booted='',bp=null,rcT=0,rfT=0,rsT=0,fsc=0,rtry=0,wq=Promise.resolve();const pend=new Set();const PW=new Map();
 const AS=(()=>{const m={};return{getItem:k=>{try{const v=localStorage.getItem(k);if(v!=null)return v}catch(e){}return k in m?m[k]:null},setItem:(k,v)=>{m[k]=v;try{localStorage.setItem(k,v)}catch(e){}},removeItem:k=>{delete m[k];try{localStorage.removeItem(k)}catch(e){}}}})();
 try{sb=window.supabase.createClient(SUPA.url,SUPA.key,{auth:{storage:AS,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}})}catch(e){}
 const EMAIL=u=>String(u).toLowerCase()+'@users.citspark.app',unOf=u=>(u&&u.user_metadata&&u.user_metadata.username)||String(u&&u.email||'').split('@')[0];
@@ -493,7 +493,8 @@ const W=(k,v)=>{if(!T[k]){DB.set('sb_'+k,v);return}
  CA[k]=v;if(!booted||!(ins.length+upd.length+del.length))return;
  const bak=new Map();ins.forEach(r=>bak.set(rid(k,r),undefined));upd.forEach(([r])=>bak.set(rid(k,r),S.get(rid(k,r))));del.forEach(i=>bak.set(i,S.get(i)));
  ins.forEach(r=>S.set(rid(k,r),cj(k,r)));upd.forEach(([r])=>S.set(rid(k,r),cj(k,r)));del.forEach(i=>S.delete(i));
- wq=wq.then(()=>psh(k,ins,upd,del)).catch(e=>{rbk(k,bak);if(k!=='presence')toast(e&&e.code==='42501'?(k==='msgs'?'You can only message accepted friends.':'You don’t have permission to do that.'+(()=>{try{console.warn('save failed',k,e);const t=String(e.message||'').match(/table "?(\w+)/);return t?' ('+t[1]+')':''}catch(x){return ''}})()):'Couldn’t save that. '+(navigator.onLine?'Please try again.':'You’re offline.'))})};
+ const ids=[...ins.map(r=>rid(k,r)),...upd.map(([r])=>rid(k,r)),...del];ids.forEach(i=>{const pk=k+'|'+i;PW.set(pk,(PW.get(pk)||0)+1)});
+ wq=wq.then(()=>psh(k,ins,upd,del)).catch(e=>{rbk(k,bak);if(k!=='presence')toast(e&&e.code==='42501'?(k==='msgs'?'You can only message accepted friends.':'You don’t have permission to do that.'+(()=>{try{console.warn('save failed',k,e);const t=String(e.message||'').match(/table "?(\w+)/);return t?' ('+t[1]+')':''}catch(x){return ''}})()):'Couldn’t save that. '+(navigator.onLine?'Please try again.':'You’re offline.'))}).finally(()=>ids.forEach(i=>{const pk=k+'|'+i,c=(PW.get(pk)||1)-1;c>0?PW.set(pk,c):PW.delete(pk)}))};
 /* [V10] charge-meter loader: progress comes from hy() (real table loads) and boo() */
 const LD=(()=>{const g=i=>document.getElementById(i),sl=ms=>new Promise(r=>setTimeout(r,ms)),
  GR=[[25,['users']],[45,['fr']],[65,['posts','comments','rx']],[80,['stories','seen','notes']],[90,['msgs','notifs','presence']]],
@@ -535,8 +536,8 @@ const hy=async(ks=KS,emit)=>{const g=(k,f)=>{let b=sb.from(T[k][0]).select('*');
 const rfp=()=>{clearTimeout(rfT);rfT=setTimeout(()=>hy(['posts','comments','rx'],1).catch(()=>{}),500)}; /* friendship changed: friends-only posts may appear/disappear */
 /* Realtime postgres_changes -> cache (echoes of our own writes are ignored) */
 const apl=(k,ev,n,o)=>{const A=CA[k],S=SN[k];
- if(ev==='DELETE'){if(!o)return;const i=rid(k,o),x=A.findIndex(r=>rid(k,r)===i);if(x<0)return;A.splice(x,1);S.delete(i);if(k==='fr')rfp();return cng(k)}
- if(!n)return;const i=rid(k,n),j=cj(k,n),x=A.findIndex(r=>rid(k,r)===i);
+ if(ev==='DELETE'){if(!o)return;const i=rid(k,o);if(PW.get(k+'|'+i))return;const x=A.findIndex(r=>rid(k,r)===i);if(x<0)return;A.splice(x,1);S.delete(i);if(k==='fr')rfp();return cng(k)}
+ if(!n)return;const i=rid(k,n);if(PW.get(k+'|'+i))return;const j=cj(k,n),x=A.findIndex(r=>rid(k,r)===i);
  if(x<0){A.push(n);S.set(i,j)}else{if(S.get(i)===j&&cj(k,A[x])===j)return;Object.assign(A[x],n);S.set(i,j)}
  if(k==='fr')rfp();cng(k)};
 const rcn=on=>{try{let e=document.getElementById('rcn');if(!e){e=document.createElement('div');e.id='rcn';e.setAttribute('role','status');e.style.cssText='position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:99999;padding:6px 12px;border-radius:14px;background:#1c2a46;color:#fff;font:600 12px sans-serif;display:none';e.textContent='Reconnecting…';document.body.appendChild(e)}e.style.display='none'}catch(x){}};
