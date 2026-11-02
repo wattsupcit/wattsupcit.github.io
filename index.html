@@ -288,6 +288,24 @@ html[data-theme=light] body:has(#auth:not([hidden]):not(.out)) #sh{--bg:#0a1022;
 .qcl{max-height:50vh;overflow:auto;padding:0 12px}.qci{display:flex;gap:8px;padding:10px 12px}
 .qci input{flex:1;min-height:44px;border-radius:22px;border:1px solid rgba(128,128,128,.4);padding:0 14px;background:transparent;color:inherit;font:inherit}
 .qci button{width:44px;height:44px;border:0;border-radius:50%;background:var(--acc);color:#fff}
+#sh.zt{z-index:80}#sh.top{height:auto;padding:0}
+.cgh{display:block;position:relative;width:64px;height:24px;margin:0 auto;touch-action:none;cursor:grab}.cgh:after{content:"";position:absolute;left:12px;right:12px;top:10px;height:4px;border-radius:2px;background:var(--mut);opacity:.5}
+#sh.cs .sc2{display:flex;flex-direction:column;height:86dvh;padding:2px 0 0;overflow:hidden}.csw{display:flex;flex-direction:column;flex:1;min-height:0}
+.csh{display:flex;justify-content:space-between;align-items:center;padding:0 8px 0 16px;min-height:44px;font-size:15px}.hi{display:flex}.hi button{display:grid;place-items:center;width:44px;height:44px;color:var(--mut)}.hi button.on{color:var(--acc)}.hi .i{width:24px;height:24px}
+.csm{padding:2px 16px 6px;font-size:15px;font-weight:600}.csl{flex:1;min-height:0;overflow:auto;padding:0 12px 8px}
+.cmr{display:flex;gap:8px;align-items:flex-start;margin:10px 0}.cmr.rp{margin-left:44px}.cmr .av{flex:none;width:36px;height:36px}.cmr.rp .av{width:26px;height:26px}.cmr .fx{min-width:0}
+.cmr .bub{display:inline-block;max-width:100%;padding:8px 12px;border-radius:18px}.cmr .bub b{display:block;font-size:13px}.cmr .bub div{font-size:15px}
+.cmt{display:flex;gap:16px;align-items:center;padding:2px 12px 0;font-size:12px;font-weight:600}.cmt button{min-height:44px;margin:-14px 0;padding:0 2px;color:var(--mut);font-weight:700}.cmt button.on{color:var(--acc)}.cl1{margin-left:auto;font-weight:400}
+.csp{display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:13px}.csp[hidden],.cse[hidden]{display:none}
+.cse{display:flex;flex-wrap:wrap;justify-content:space-around;padding:4px 8px}.cse button{width:44px;height:44px;font-size:24px}
+.csb{display:flex;align-items:center;gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);background:var(--card)}
+.csi{display:grid;place-items:center;flex:none;width:40px;height:44px;color:var(--mut)}.csi .i,.csn .i{width:24px;height:24px}
+.csn{display:flex;flex:1;min-width:0;align-items:center;min-height:44px;padding:0 4px 0 14px;border-radius:22px;background:var(--ln)}.csn input{flex:1;min-width:0;min-height:44px;border:0;background:none;color:inherit;font:inherit}
+.csg{display:grid;place-items:center;min-width:26px;height:44px;font-size:11px;font-weight:800;color:var(--mut)}.csn button{display:grid;place-items:center;width:40px;height:44px;color:var(--mut)}.csd{flex:none;color:var(--acc)}
+.vh{display:flex;align-items:center;justify-content:space-between}.vh button{display:grid;place-items:center;width:44px;height:44px;margin:0}
+.vf{padding:8px 12px calc(8px + env(safe-area-inset-bottom));max-height:44vh;overflow:auto;background:#000}.vi{display:flex;gap:10px;align-items:center}.vi .av{width:40px;height:40px}
+.vcp{margin:8px 0 0;overflow-wrap:anywhere}.vs{display:flex;justify-content:space-between;padding:8px 0;font-size:13px}.vf b{font-size:15px}.vf .bar{gap:8px;padding-top:2px}.vf .act{display:flex;flex:1;align-items:center;justify-content:center;gap:6px;min-height:44px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-weight:600}.vf .act.on{color:#5b9bff}.vrp{z-index:5}
+.vmo .tr{width:100%;min-height:48px;padding:0 8px;text-align:left}
 .qvc{position:absolute;inset:0;pointer-events:none}
 .qvm{position:absolute;right:0;bottom:3px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#fff;pointer-events:auto;isolation:isolate}
 .qvm::before{content:"";position:absolute;z-index:-1;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.55)}.qvm .i{width:18px;height:18px}
@@ -468,7 +486,7 @@ try{sb=window.supabase.createClient(SUPA.url,SUPA.key,{auth:{storage:AS,persistS
 const EMAIL=u=>String(u).toLowerCase()+'@users.citspark.app',unOf=u=>(u&&u.user_metadata&&u.user_metadata.username)||String(u&&u.email||'').split('@')[0];
 const ferr=x=>{const s=String(x&&x.message||x||'').toLowerCase();return !sb||!navigator.onLine||/failed to fetch|network|load failed|timeout/.test(s)?'You’re offline. Check your connection and try again.':/invalid login|invalid credentials/.test(s)?'Incorrect password.':/already|duplicate|unique/.test(s)?'That username or email is already used.':/email rate limit|over_email_send_rate_limit/.test(s)?'Too many emails sent. Wait a while, then try again.':/only request this after|for security purposes/.test(s)?'Please wait a minute before asking for another code.':/rate limit|too many/.test(s)?'Too many tries. Wait a minute and try again.':'Something went wrong. Please try again.'+(DEV&&(s||x&&x.code)?' ['+[x&&x.status,x&&x.code,s.slice(0,140)].filter(Boolean).join(' · ')+']':'')};
 /* R('key') -> table; [table, primary key cols, other cols] */
-const T={users:['profiles',['username'],['name','first','middle','last','suffix','contact','avatar','avm','cover','covm','bio','edu','dob','g']],fr:['friendships',['id'],['from','to','status','ts']],posts:['posts',['id'],['user','text','ms','bg','img','vid','of','kind','aud','ts']],comments:['comments',['id'],['post','user','text','ts']],rx:['reactions',['post','user'],['t']],stories:['stories',['id'],['user','text','m','mk','img','bg','ts']],seen:['story_views',['s','u'],[]],msgs:['messages',['id'],['a','b','txt','m','mk','ts','r','st']],notifs:['notifications',['id'],['to','from','k','text','ts','r','link']],notes:['notes',['u'],['text','ts']],presence:['presence',['u'],['t']]};
+const T={users:['profiles',['username'],['name','first','middle','last','suffix','contact','avatar','avm','cover','covm','bio','edu','dob','g']],fr:['friendships',['id'],['from','to','status','ts']],posts:['posts',['id'],['user','text','ms','bg','img','vid','of','kind','aud','ts']],comments:['comments',['id'],['post','user','text','ts','parent']],rx:['reactions',['post','user'],['t']],stories:['stories',['id'],['user','text','m','mk','img','bg','ts']],seen:['story_views',['s','u'],[]],msgs:['messages',['id'],['a','b','txt','m','mk','ts','r','st']],notifs:['notifications',['id'],['to','from','k','text','ts','r','link']],notes:['notes',['u'],['text','ts']],presence:['presence',['u'],['t']]};
 const KS=Object.keys(T),CA={},SN={},CL={};KS.forEach(k=>{CA[k]=[];SN[k]=new Map();CL[k]=T[k][1].concat(T[k][2])});
 const rid=(k,r)=>T[k][1].map(c=>r[c]).join('|'),cj=(k,r)=>JSON.stringify(CL[k].map(c=>r[c]==null?null:r[c]));
 /* RT: same events as before ('data' key, 'presence', 'typing'); renders are batched to one per frame */
@@ -665,12 +683,12 @@ const mel=(m,th,c='')=>m.k==='v'?`<video class="${c}" data-mid="${m.id}" muted l
 const grid=p=>{const m=p.ms||[],n=m.length;return n?`<div class="gr g${Math.min(n,5)}">${m.slice(0,5).map((x,i)=>`<button class="gi" data-v="${i}">${mel(x,n>2,x.k==='v'?'m fv':'m')}${x.k==='v'?VC():''}${i===4&&n>5?`<b class="mo">+${n-5}</b>`:''}</button>`).join('')}</div>`:''};
 const cm=c=>{const u=who(c.user);return `<div class="cm"><span class="pu" data-u="${esc(c.user)}">${av(u)}</span><div class="bub"><b class="pu" data-u="${esc(c.user)}">${esc(u.name)}</b> <span class="mut">${ago(c.ts)}</span><div>${esc(c.text)}</div></div></div>`};
 const spShn=(p,X)=>(X.sh=X.sh||R('posts').reduce((a,q)=>(q.of&&(a[q.of]=(a[q.of]||0)+1),a),{}))[p.id]||0;
-const spNest=(p,X)=>{const o=(X.P=X.P||R('posts')).find(q=>q.id===p.of);if(!o||(o.aud==='me'&&o.user!==me.username))return '<div class="sn mut">This post is no longer available</div>';const w=who(o.user);return `<div class="sn" data-sn="${esc(o.user)}"><div class="ph"><span class="pu" data-u="${esc(o.user)}">${av(w)}</span><div class="fx"><b class="pu" data-u="${esc(o.user)}">${esc(w.name)}</b><div class="mut">${ago(o.ts)}</div></div></div>${o.text?`<p class="pt">${esc(o.text)}</p>`:''}${(o.ms||[]).slice(0,1).map(m=>mel(m,0,'m')).join('')}${o.img?`<img class="m" src="${esc(o.img)}" alt="">`:''}</div>`};
+const spNest=(p,X)=>{const o=(X.P=X.P||R('posts')).find(q=>q.id===p.of);if(!o||(o.aud==='me'&&o.user!==me.username))return '<div class="sn mut">This post is no longer available</div>';const w=who(o.user);return `<div class="sn" data-sn="${esc(o.user)}" data-so="${esc(o.id)}"><div class="ph"><span class="pu" data-u="${esc(o.user)}">${av(w)}</span><div class="fx"><b class="pu" data-u="${esc(o.user)}">${esc(w.name)}</b><div class="mut">${ago(o.ts)}</div></div></div>${o.text?`<p class="pt">${esc(o.text)}</p>`:''}${(o.ms||[]).slice(0,1).map(m=>m.k==='v'?`<div class="gr g1"><button class="gi" data-v="${m.id}">${mel(m,0,'m fv')}${VC()}</button></div>`:mel(m,0,'m')).join('')}${o.img?`<img class="m" src="${esc(o.img)}" alt="">`:''}</div>`};
 const post=(p,X)=>{
  const u=who(p.user),rs=X.r.filter(r=>r.post===p.id),my=(rs.find(r=>r.user===me.username)||{}).t,cs=X.c.filter(c=>c.post===p.id).sort((a,b)=>a.ts-b.ts),o=ex.has(p.id),
  tp=Object.entries(rs.reduce((a,r)=>(a[r.t]=(a[r.t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>RX[x[0]]||'👍').join(''),
  tx=p.bg!=null&&p.text&&!(p.ms||[]).length&&!p.img&&!p.vid;
- return `<article class="card post" data-id="${p.id}"><div class="ph"><span class="pu" data-u="${esc(p.user)}">${av(u)}</span><div class="fx"><b class="pu" data-u="${esc(p.user)}">${esc(u.name)}</b>${p.of?' shared a post':p.kind==='av'?' updated their profile picture':p.kind==='cv'?' updated their cover photo':''}<div class="mut">${ago(p.ts)} · ${AU[p.aud||'fr']}</div></div>${p.user===me.username?`<button class="ic2" data-a="opt" aria-label="Post options">${ic('dots')}</button>`:''}</div>${tx?`<div class="tp2" style="background:${GR[p.bg]||GR[0]}">${esc(p.text)}</div>`:p.text?`<p class="pt">${esc(p.text)}</p>`:''}${p.of?spNest(p,X):''}${grid(p)}${media(p)}${rs.length||cs.length||spShn(p,X)?`<div class="sm mut"><span>${tp} ${rs.length||''}</span><span>${[cs.length?cs.length+' comment'+(cs.length>1?'s':''):'',spShn(p,X)?spShn(p,X)+' share'+(spShn(p,X)>1?'s':''):''].filter(Boolean).join(' · ')}</span></div>`:''}<div class="bar"><button class="act${my?' on':''}" data-a="rx"><span class="em">${my&&my!=='like'?RX[my]:ic('like')}</span> ${my?cap(my):'Like'}</button><button class="act" data-a="cm">${ic('cm')} Comment</button>${p.aud==='me'?'':'<button class="act" data-a="sh"><span class="em">↪</span> Share</button>'}</div>${o?`<div class="cms">${cs.map(cm).join('')}<div class="cin"><input placeholder="Write a comment…"><button class="btn" data-a="send">Send</button></div></div>`:''}</article>`};
+ return `<article class="card post" data-id="${p.id}"><div class="ph"><span class="pu" data-u="${esc(p.user)}">${av(u)}</span><div class="fx"><b class="pu" data-u="${esc(p.user)}">${esc(u.name)}</b>${p.of?' shared a post':p.kind==='av'?' updated their profile picture':p.kind==='cv'?' updated their cover photo':''}<div class="mut">${ago(p.ts)} · ${AU[p.aud||'fr']}</div></div>${p.user===me.username?`<button class="ic2" data-a="opt" aria-label="Post options">${ic('dots')}</button>`:''}</div>${tx?`<div class="tp2" style="background:${GR[p.bg]||GR[0]}">${esc(p.text)}</div>`:p.text?`<p class="pt">${esc(p.text)}</p>`:''}${p.of?spNest(p,X):''}${grid(p)}${media(p)}${rs.length||cs.length||spShn(p,X)?`<div class="sm mut"><span>${tp} ${rs.length||''}</span><span>${[cs.length?cs.length+' comment'+(cs.length>1?'s':''):'',spShn(p,X)?spShn(p,X)+' share'+(spShn(p,X)>1?'s':''):''].filter(Boolean).join(' · ')}</span></div>`:''}<div class="bar"><button class="act${my?' on':''}" data-a="rx"><span class="em">${my&&my!=='like'?RX[my]:ic('like')}</span> ${my?cap(my):'Like'}</button><button class="act" data-a="cm">${ic('cm')} Comment</button>${p.aud==='me'||p.of?'':'<button class="act" data-a="sh"><span class="em">↪</span> Share</button>'}</div>${o?`<div class="cms">${cs.map(cm).join('')}<div class="cin"><input placeholder="Write a comment…"><button class="btn" data-a="send">Send</button></div></div>`:''}</article>`};
 const SK='<div class="card"><div class="ph"><i class="av sk"></i><div class="fx"><i class="sl" style="width:40%"></i></div></div><i class="sl"></i><i class="sl" style="width:80%"></i></div>';
 const AU={pub:'Public',fr:'Friends',me:'Only me'};
 const vis=p=>p.user===me.username||p.aud==='pub'||(p.aud!=='me'&&fl(me.username).includes(p.user));
@@ -692,8 +710,43 @@ const rxSent=id=>{const K='sb_rxn_'+me.username,k='post:'+id;let a=DB.get(K,[]);
 const sendC=el=>{const id=el.dataset.id,t=$('.cin input',el).value.trim();if(!t)return;
  const cs=R('comments');cs.push({id:uid(),post:id,user:me.username,text:t,ts:Date.now()});W('comments',cs);
  const p=R('posts').find(x=>x.id===id);if(p)notify(p.user,'comment',`commented: “${t.slice(0,80)}”`,'post:'+id);refresh(id);$(`#feed [data-id="${id}"] .cin input`).focus()};
-const vw=(p,i)=>{const m=p.ms,sv=$('#sv'),sh=()=>{const x=m[i];sv.innerHTML=`<div class="sh"><span class="mut">${i+1} / ${m.length}</span><button data-c aria-label="Close">${ic('x')}</button></div><div class="sb vb">${mel(x,0,'th').replace('muted ','controls ')}</div>`;sv.hidden=false;hyd(sv)};
- sv.onclick=e=>{if(e.target.closest('[data-c]')){sv.hidden=true;sv.innerHTML='';return}if(e.target.tagName==='VIDEO')return;i=(i+(e.clientX<innerWidth/2?-1:1)+m.length)%m.length;sh()};sh()};
+const myRx=id=>(R('rx').find(r=>r.post===id&&r.user===me.username)||{}).t;
+const rxSm=id=>{const x=R('rx').filter(r=>r.post===id),t=Object.entries(x.reduce((a,r)=>(a[r.t]=(a[r.t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>RX[e[0]]||'👍').join('');return x.length?`<span>${t} ${x.length}</span>`:'<span></span>'};
+let csR=null;
+const csL=id=>{const A=R('comments').filter(c=>c.post===id).sort((a,b)=>a.ts-b.ts),L=DB.get('sb_cl_'+me.username,[]),one=(c,r)=>{const u=who(c.user);return `<div class="cmr${r?' rp':''}"><span class="pu" data-u="${esc(c.user)}">${av(u)}</span><div class="fx"><div class="bub"><b class="pu" data-u="${esc(c.user)}">${esc(u.name)}</b><div>${esc(c.text)}</div></div><div class="cmt mut"><span>${ago(c.ts)}</span><button data-cl="${esc(c.id)}"${L.includes(c.id)?' class="on"':''}>Like</button><button data-cr="${esc(c.id)}">Reply</button>${L.includes(c.id)?'<span class="cl1">👍 1</span>':''}</div></div></div>`},T0=A.filter(c=>!c.parent||!A.some(x=>x.id===c.parent));return T0.length?T0.map(c=>one(c,0)+A.filter(r=>r.parent===c.id).map(r=>one(r,1)).join('')).join(''):'<p class="empty">No comments yet.</p>'};
+const csS=(id,cb)=>{const p=R('posts').find(x=>x.id===id);if(!p)return toast('That post is no longer available.');csR=null;
+ sheet(`<div class="csw"><i class="cgh" role="separator"></i><div class="csh" id="csh"></div><div class="csm">Most relevant ▾</div><div class="csl" id="csl"></div><div class="csp mut" id="csp" hidden></div><div class="cse" id="cse" hidden>${EM.map(e=>`<button data-ce="${e}" aria-label="${e}">${e}</button>`).join('')}</div><div class="csb"><span class="csi" aria-hidden="true">${ic('img')}</span><div class="csn"><input id="csx" maxlength="500" placeholder="Write a comment..." autocomplete="off"><span class="csg" aria-hidden="true">GIF</span><span class="csg" aria-hidden="true">@</span><button data-ct aria-label="Emoji">${ic('smile')}</button></div><button class="ic2 csd" data-cd aria-label="Send">${ic('send')}</button></div></div>`,'zt cs');
+ const W0=$('.csw'),L=$('#csl',W0),I=$('#csx',W0),rb=$('#csp',W0),rl=()=>{L.innerHTML=csL(id)},hdr=()=>{$('#csh',W0).innerHTML=rxSm(id)+`<span class="hi"><button data-hl aria-label="Like"${myRx(id)?' class="on"':''}>${ic('like')}</button><button data-hc aria-label="Comment">${ic('cm')}</button><button data-hs aria-label="Share">${ic('share')}</button></span>`},
+ snd=()=>{const t=I.value.trim();if(!t)return;const o={id:uid(),post:id,user:me.username,text:t,ts:Date.now()};if(csR)o.parent=csR;const pr=csR&&R('comments').find(x=>x.id===csR);W('comments',[...R('comments'),o]);
+  if(p.user!==me.username)notify(p.user,'comment',`commented: “${t.slice(0,80)}”`,'post:'+id);if(pr&&pr.user!==me.username&&pr.user!==p.user)notify(pr.user,'comment',`replied: “${t.slice(0,80)}”`,'post:'+id);
+  I.value='';csR=null;rb.hidden=true;$('#cse',W0).hidden=true;rl();L.scrollTop=L.scrollHeight;refresh(id);cb&&cb()};rl();hdr();
+ W0.onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.cl){const K='sb_cl_'+me.username,a=DB.get(K,[]);DB.set(K,a.includes(d.cl)?a.filter(x=>x!==d.cl):[...a,d.cl].slice(-500));return rl()}
+  if(d.cr){const c=R('comments').find(x=>x.id===d.cr);if(!c)return;csR=c.parent||c.id;rb.innerHTML=`<span>Replying to <b>${esc(who(c.user).name)}</b></span><button class="ic2" data-cx aria-label="Cancel reply">${ic('x')}</button>`;rb.hidden=false;return I.focus()}
+  if('hl' in d){react(id,myRx(id)?null:'like');hdr();refresh(id);cb&&cb();return}if('hc' in d)return I.focus();if('hs' in d){spSh(id);return $('#sh').classList.add('zt')}
+  if('cx' in d){csR=null;rb.hidden=true;return}
+  if('ct' in d){$('#cse',W0).hidden=!$('#cse',W0).hidden;return}
+  if(d.ce){I.value+=d.ce;return I.focus()}
+  if('cd' in d)snd()};
+ I.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();snd()}};
+ const gh=$('.cgh',W0);let y0=null;gh.onpointerdown=e=>{y0=e.clientY;gh.setPointerCapture(e.pointerId)};gh.onpointermove=e=>{if(y0!=null&&e.clientY-y0>60){y0=null;closeSheet()}};gh.onpointerup=gh.onpointercancel=()=>{y0=null}};
+const vmS=p=>{const mine=p.user===me.username;sheet(`${spX('Photo options')}<div class="vmo"><button class="tr" data-vo="l">Copy link</button>${mine?'<button class="tr" data-vo="d" style="color:var(--red)">Delete post</button>':'<button class="tr" data-vo="r">Report photo</button>'}</div>`,'zt');$('.vmo').onclick=e=>{const b=e.target.closest('[data-vo]');if(!b)return;const v=b.dataset.vo;
+ if(v==='d'&&mine)return cfm({t:'Delete post?',x:'This also removes its comments and reactions.',b:'Delete',top:1,fn:()=>{const x=$('#sv [data-c]');x&&x.click();delPost(p.id)}});
+ closeSheet();if(v==='r')return toast('Thanks. We’ll review this photo.');const u=location.href.split('#')[0];(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Link copied'),()=>toast(u))}};
+const vw=(p,i)=>{const m=p.ms,sv=$('#sv'),id=p.id;let vlp=0,vt=0;
+ const vf=()=>{const f=sv.querySelector('.vf');if(!f)return;const my=myRx(id),nr=R('rx').filter(r=>r.post===id).length,c=R('comments').filter(x=>x.post===id).length,sc=R('posts').filter(q=>q.of===id).length,n=(k,l)=>k||l;
+  f.innerHTML=`<b>${esc(who(p.user).name)}</b><div class="mut">${ago(p.ts)} · ${AU[p.aud||'fr']}</div>${p.text?`<p class="vcp">${esc(p.text)}</p>`:''}<div class="vs mut">${rxSm(id)}</div><div class="bar"><button class="act${my?' on':''}" data-vl><span class="em">${my&&my!=='like'?RX[my]:ic('like')}</span> ${n(nr,my?cap(my):'Like')}</button><button class="act" data-vc>${ic('cm')} ${n(c,'Comment')}</button><button class="act" data-vs>${ic('share')} ${n(sc,'Share')}</button></div>`},
+ sh=()=>{const x=m[i];sv.innerHTML=`<div class="sh vh"><button data-c aria-label="Close">${ic('x')}</button><span class="mut">${i+1} / ${m.length}</span><button data-vmn aria-label="Menu">${ic('dots')}</button></div><div class="sb vb">${mel(x,0,'th').replace('muted ','controls ')}</div><div class="vf"></div>`;sv.hidden=false;hyd(sv);vf()},
+ rx=t=>{react(id,t);sv.querySelectorAll('.vrp').forEach(x=>x.remove());vf()};
+ sv.onpointerdown=e=>{const b=e.target.closest('[data-vl]');clearTimeout(vt);vlp=0;if(b)vt=setTimeout(()=>{vlp=1;const r=b.getBoundingClientRect(),d=document.createElement('div');d.className='rpz on vrp';d.innerHTML=Object.keys(RX).map(k=>`<button data-vr="${k}" aria-label="${k}">${RX[k]}</button>`).join('');sv.appendChild(d);d.style.left=Math.max(8,Math.min(r.left,innerWidth-d.offsetWidth-8))+'px';d.style.top=Math.max(8,r.top-60)+'px'},420)};
+ sv.onpointerup=sv.onpointercancel=e=>{clearTimeout(vt);if(!vlp)return;const t=document.elementFromPoint(e.clientX,e.clientY),b=t&&t.closest('[data-vr]');if(b)rx(b.dataset.vr)};
+ sv.onclick=e=>{const t=e.target;if(t.closest('[data-c]')){sv.hidden=true;sv.innerHTML='';sv.onpointerdown=sv.onpointerup=sv.onpointercancel=null;return}
+  const b=t.closest('[data-vr]');if(b)return rx(b.dataset.vr);if(vlp){vlp=0;return}sv.querySelectorAll('.vrp').forEach(x=>x.remove());
+  if(t.closest('[data-vl]'))return rx(myRx(id)?null:'like');
+  if(t.closest('[data-vc]'))return csS(id,vf);
+  if(t.closest('[data-vs]')){spSh(id);return $('#sh').classList.add('zt')}
+  if(t.closest('[data-vmn]'))return vmS(p);
+  if(!t.closest('.vb')||t.tagName==='VIDEO')return;i=(i+(e.clientX<innerWidth/2?-1:1)+m.length)%m.length;sh()};sh()};
 /* ===== COMPOSER (posts + MyDay) ===== */
 const cmp=()=>{const l=$('#lk').value.trim(),to=!C.ms.length&&!l,cb=$('#cb');
  $('#pv').innerHTML=C.ms.map((m,i)=>`<div class="pvi">${mel(m,1)}<button data-r="${i}" aria-label="Remove">${ic('x')}</button></div>`).join('');hyd($('#pv'));
@@ -843,7 +896,7 @@ document.addEventListener('click',e=>{const t=e.target,c=q=>t.closest(q);let x;i
  if(x=c('[data-pf]')){e.stopPropagation();return prof(x.dataset.pf)}
  if(x=c('[data-op]')){pgT='all';pgR();const el=$(`#pg [data-id="${x.dataset.op}"]`);if(el){el.scrollIntoView({block:'center'});el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),1600)}return}
  if(x=c('.pu')){const h=x.closest('[data-u]');if(h&&find(h.dataset.u)){e.stopPropagation();if(!(c('#pg')&&h.dataset.u===pgS.at(-1)))prof(h.dataset.u);return}}
- if(x=c('[data-sn]')){e.stopPropagation();return prof(x.dataset.sn)}
+ if(x=c('[data-sn]')){e.stopPropagation();if(c('.gi,[data-vm]'))return;const op=R('posts').find(q=>q.id===x.dataset.so);if(op&&(op.ms||[]).length&&c('img.m'))return vw(op,0);return prof(x.dataset.sn)}
  if(x=c('.nt .o')){const r=x.closest('.nt');if(r&&find(r.dataset.f)){e.stopPropagation();return prof(r.dataset.f)}}
  if(x=c('.tr .av')){const r=x.closest('.tr');if(r&&r.dataset.c&&find(r.dataset.c)){e.stopPropagation();return prof(r.dataset.c)}}
  if(c('#pg')){if(x=c('[data-s]'))return story(x.dataset.s);
@@ -999,7 +1052,7 @@ $('#t-home').onclick=e=>{const t=e.target,o=t.closest('[data-o]'),pu=t.closest('
  if(gv)return vw(R('posts').find(p=>p.id===id),+gv.dataset.v);
  const b=t.closest('[data-a]');if(!b)return;const a=b.dataset.a;
  if(a==='rx'){if(lp)return;react(id,R('rx').some(r=>r.post===id&&r.user===me.username)?null:'like')}
- else if(a==='cm'){ex.has(id)?ex.delete(id):ex.add(id);refresh(id);ex.has(id)&&$(`#feed [data-id="${id}"] .cin input`).focus()}
+ else if(a==='cm')csS(id)
  else if(a==='opt')postOpt(id);else sendC(el)};
 $('#t-home').onkeydown=e=>{if(e.key==='Enter'&&e.target.matches('.cin input')){e.preventDefault();sendC(e.target.closest('.post'))}};
 const showRp=b=>{const r=b.getBoundingClientRect(),p=$('#rp2');p.dataset.id=b.closest('.post').dataset.id;p.style.left=Math.max(8,Math.min(r.left,innerWidth-p.offsetWidth-8))+'px';p.style.top=Math.max(8,r.top-56)+'px';p.classList.add('on')};
@@ -1215,7 +1268,7 @@ const nm=u=>{const w=who(u);return esc(typeof w==='string'?w:(w&&(w.name||w.user
 function rail(p){const id=p.id,x=R('rx').filter(r=>r.post===id),my=x.find(r=>r.user===me.username),c=R('comments').filter(r=>r.post===id).length,s=R('posts').filter(q=>q.of===id).length;
  return `<button data-qlk class="${my?'on':''}" aria-label="Like">${my?`<span class="qre">${RX[my.t]||'👍'}</span>`:ic('like')}<span>${K(x.length)}</span></button><button data-qcm aria-label="Comments">${ic('cm')}<span>${K(c)}</span></button><button data-qsh aria-label="Share">${ic('share')}<span>${K(s)}</span></button><button data-qmo aria-label="More">${ic('dots')}</button>`}
 function inf(p){const u=p.user,f=u===me.username?null:fs(u),t=p.text||'';
- return `<div class="qus"><span class="qua" data-qp="${esc(u)}">${av(u,'')}<b>${nm(u)}</b></span>${f===null?'':f===''?`<button class="qfb" data-qf="${esc(u)}"><span>Add friend</span></button>`:`<span class="qfs">${f==='f'?'Friends ✓':'Requested'}</span>`}</div>${t?`<div class="qcap" data-qcp>${esc(t)}</div>${t.length>70?'<span class="qmr" data-qcp>…more</span>':''}`:''}`}
+ return `<div class="qus"><span class="qua" data-qp="${esc(u)}">${av(who(u),'')}<b>${nm(u)}</b></span>${f===null?'':f===''?`<button class="qfb" data-qf="${esc(u)}"><span>Add friend</span></button>`:`<span class="qfs">${f==='f'?'Friends ✓':'Requested'}</span>`}</div>${t?`<div class="qcap" data-qcp>${esc(t)}</div>${t.length>70?'<span class="qmr" data-qcp>…more</span>':''}`:''}`}
 function rit(p){const m=p.ms.find(m=>m.k==='v');
  return `<section class="ri" data-id="${esc(p.id)}"><video class="qv" data-rm="${esc(m.id)}" loop playsinline preload="auto"></video><button class="qtap" data-qt aria-label="Play or pause"></button><span class="qfl"></span><div class="qui"><div class="qrl">${rail(p)}</div><div class="qinf">${inf(p)}</div><i class="qpg"><b></b></i><button class="qin" data-qcm>Add a comment…</button></div></section>`}
 async function ld(r){const v=r.querySelector('video');if(!v||v.getAttribute('src')||v._l)return;v._l=1;try{const u=await mu(v.dataset.rm,1);if(u&&r.isConnected&&!v.getAttribute('src')){v.defaultPlaybackRate=v.playbackRate=RATE;v.src=u}}catch(e){}v._l=0}
@@ -1249,7 +1302,7 @@ document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;cons
  if(q('[data-qlk]')){if(lp){lp=0;return}const m=R('rx').find(x=>x.post===id&&x.user===me.username);react(id,m?null:'like');rf()}
  else if(b=q('[data-qrx]')){react(id,b.dataset.qrx);$$('.qpk').forEach(x=>x.remove());rf()}
  else if(q('[data-qt]')){const v=r.querySelector('video');if(v.paused)pl(v,SND===true);else v.pause();fl(r,v.paused?'pause':'play')}
- else if(q('[data-qcm]'))cmS(id)
+ else if(q('[data-qcm]'))csS(id,rf)
  else if(q('[data-qsh]'))spSh(id)
  else if(q('[data-qmo]')){const p=P();p&&opS(p)}
  else if(b=q('[data-qp]'))prof(b.dataset.qp)
